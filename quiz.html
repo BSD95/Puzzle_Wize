@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center" id="quiz-title"></h1>
+        <form id="quiz-form"></form>
+        <div class="text-center">
+            <button type="button" class="btn btn-success btn-block" id="submit-quiz">Submit Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            easy: [
+                { id: 1, question: 'While researching, you find two articles on the same topic with contradictory conclusions. What should you do next?', correct_answer: 'Review both articles to assess the evidence and sources cited', options: [' Choose the article that aligns with your existing beliefs3', 'Discard both articles as unreliable', 'Review both articles to assess the evidence and sources cited', 'Counter with an article that contradicts their standing'] },
+                { id: 2, question: 'A source claims that “organic foods are always healthier.” What question should you ask?', correct_answer: '“Who conducted this study?”', options: ['“How expensive are they?”', 'Who conducted this study?', 'Are organic foods easy to find?', 'How do they taste?'] },
+                { id: 3, question: 'An advertisement says, “Experts recommend this diet.” What’s missing for a critical thinker?', correct_answer: 'Specific expert names', options: ['Specific expert names', 'Lists of the diet', 'Reasons why it is popular', 'Information about cost'] },
+                { id: 4, question: 'An argument relies solely on emotional stories. What might be lacking?', correct_answer: 'Statistics and evidence', options: ['Credibility', 'Statistics and evidence', 'Personal opinions', 'Easy language'] },
+                { id: 5, question: 'You find a website with flashy graphics but no citations for its claims. What does this suggest?', correct_answer: 'It’s mostly opinion-based', options: ['The information is crediblet', 'It’s mostly opinion-based', 'The graphics enhance its reliability', 'It has been thoroughly researched'] },
+                { id: 6, question: 'A claim states, “People who exercise regularly are happier.” What would help you assess this claim?', correct_answer: 'Evidence showing causation, not just correlation', options: ['The popularity of the claim', 'Evidence showing causation, not just correlation', 'The opinions of friends who exercise', 'Statistics on exercise trends'] },
+                { id: 7, question: 'A diet claims “guaranteed results.” What should you look for next?', correct_answer: 'Scientific evidence and studies', options: ['Testimonials from users', 'Scientific evidence and studies', 'The price of the diet plan', 'Endorsements from celebrities'] },
+                { id: 8, question: 'An article concludes, “This method is best because it’s widely accepted.” What type of reasoning is this?', correct_answer: 'Appeal to popularity', options: ['Appeal to popularity', 'Cause and effect', 'Empirical evidence', 'Logical reasoning'] },
+                { id: 9, question: 'A study finds “95% of users report satisfaction.” Which detail would help verify this?', correct_answer: 'Sample size and demographic details', options: ['Sample size and demographic details', 'Cost of the product', 'User reviews online', 'The advertising budget'] },
+                { id: 10, question: 'A friend says, “I’ve only seen positive reviews for this movie, so it must be good.” What’s a critical flaw in this reasoning?', correct_answer: 'Positive reviews don’t guarantee quality', options: ['It’s based on the friend’s opinion', 'It doesn’t account for personal taste in movies', 'Positive reviews don’t guarantee quality', 'The movie could be overrated'] },
+            ],
+            moderate: [
+                { id: 1, question: 'If a conclusion is logically valid, it must also be true.', correct_answer: 'false' },
+                { id: 2, question: 'If two experts disagree on a topic, both opinions are equally valid.', correct_answer: 'false' },
+                { id: 3, question: 'If an event happens after another, it must have been caused by the first event.', correct_answer: 'false' },
+                { id: 4, question: 'An argument’s persuasiveness depends more on the evidence presented than on the person presenting it.', correct_answer: 'true' },
+                { id: 5, question: 'Two people can disagree on the same evidence and both still be considered logical thinkers.', correct_answer: 'true' },
+                { id: 6, question: 'If a statement is widely accepted as true, it does not need evidence to support it.', correct_answer: 'false' },
+                { id: 7, question: 'Stealing is morally acceptable if it is used for good.', correct_answer: 'false' },
+                { id: 8, question: 'A conclusion can be reasonable even if it cannot be proven with absolute certainty.', correct_answer: 'True' },
+                { id: 9, question: 'Eliot studies astronomy, he is an astronomer.', correct_answer: 'false' },
+                { id: 10, question: 'Is 1 a prime number?', correct_answer: 'false' },
+            ],
+            hard: [
+                { id: 1, question: 'You notice that a friend frequently skips meals. What is your main concern?', correct_answer: 'Health' },
+                { id: 2, question: 'You learn a recipe contains an ingredient you’re allergic to. What should you do?', correct_answer: 'Substitute' },
+                { id: 3, question: 'You hear a rumor about a promotion. What should you do?', correct_answer: 'Verify' },
+                { id: 4, question: 'You are lost in the mountains, what should you look for first?', correct_answer: ' A River' },
+                { id: 5, question: 'How would you justify a claim?', correct_answer: 'Evidences' },
+                { id: 6, question: 'It suddenly becomes dark and the sun is no where to be seen, what is happening?', correct_answer: 'An Eclipse' },
+                { id: 7, question: 'I have 6 apples, I slice 2, I bake 2, and I eat 2. How many do I have left?', correct_answer: '4' },
+                { id: 8, question: 'If you see no difference in an intervention, what must be done?', correct_answer: 'Change' },
+                { id: 9, question: 'ou overhear a colleague discussing a controversial topic passionately. What is their motivation?', correct_answer: 'Belief' },
+                { id: 10, question: 'You see a large number of employee resignations in a month. What may be the concern?', correct_answer: 'Morale' },
+            ]
+        };
+
+        const difficulty = localStorage.getItem('difficulty');
+        const selectedQuestions = questions[difficulty];
+        const quizTitle = document.getElementById('quiz-title');
+        const quizForm = document.getElementById('quiz-form');
+
+        quizTitle.innerText = `Quiz - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level`;
+
+        selectedQuestions.forEach(question => {
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('form-group');
+
+            if (difficulty === 'easy') {
+                questionDiv.innerHTML = `<label>${question.question}</label>`;
+                question.options.forEach(option => {
+                    questionDiv.innerHTML += `
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="answer_${question.id}" value="${option}">
+                            <label class="form-check-label">${option}</label>
+                        </div>`;
+                });
+            } else if (difficulty === 'moderate') {
+                questionDiv.innerHTML = `
+                    <label>${question.question}</label>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="answer_${question.id}" value="true">
+                        <label class="form-check-label">True</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="answer_${question.id}" value="false">
+                        <label class="form-check-label">False</label>
+                    </div>`;
+            } else {
+                questionDiv.innerHTML = `
+                    <label>${question.question}</label>
+                    <input type="text" class="form-control" name="answer_${question.id}">`;
+            }
+
+            quizForm.appendChild(questionDiv);
+        });
+
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            let allAnswered = true;
+            const feedback = [];
+            let totalScore = 0;
+
+            selectedQuestions.forEach(question => {
+                const radioAnswers = document.querySelectorAll(`input[name="answer_${question.id}"]:checked`);
+                const textAnswer = document.querySelector(`input[name="answer_${question.id}"]`);
+                let userAnswer = "";
+
+                if (difficulty === 'easy' || difficulty === 'moderate') {
+                    if (radioAnswers.length === 0) {
+                        allAnswered = false;
+                    } else {
+                        userAnswer = radioAnswers[0].value.trim().toLowerCase();
+                    }
+                } else if (difficulty === 'hard') {
+                    if (textAnswer && textAnswer.value.trim() === "") {
+                        allAnswered = false;
+                    } else {
+                        userAnswer = textAnswer.value.trim().toLowerCase();
+                    }
+                }
+
+                if (userAnswer !== "") {
+                    const correctAnswer = question.correct_answer.toLowerCase();
+                    const isCorrect = userAnswer === correctAnswer;
+                    if (isCorrect) totalScore++;
+
+                    feedback.push({
+                        question_id: question.id,
+                        question_text: question.question,
+                        your_answer: userAnswer,
+                        correct_answer: correctAnswer,
+                        is_correct: isCorrect
+                    });
+                }
+            });
+
+            if (!allAnswered) {
+                alert('Please answer all questions before submitting.');
+                return;
+            }
+
+            localStorage.setItem('totalScore', totalScore);
+            localStorage.setItem('feedback', JSON.stringify(feedback));
+            window.location.href = 'result.html';
+        });
+    </script>
+</body>
+</html>
